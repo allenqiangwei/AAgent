@@ -1,0 +1,71 @@
+---
+description: Minimal Superpowers execution discipline for Python (designed to coexist with planning-with-files)
+globs: ["**/*.py", "**/*.md", "**/pyproject.toml", "**/requirements*.txt", "**/pytest.ini", "**/setup.cfg"]
+alwaysApply: true
+---
+
+# Superpowers (MVP) — Python Execution Discipline
+
+## 0) Coexistence rule (avoid conflicts)
+- Assume "planning-with-files" is installed and is the source of truth for: task_plan.md / findings.md / progress.md lifecycle.
+- Do NOT create alternative planning files or duplicate the same plan elsewhere.
+- This file only adds execution rigor: TDD, verification, small steps, self-review, safe changes.
+
+## 1) Gate: don't code without an approved plan
+- If the user request is non-trivial (multi-step, multi-file, or unclear acceptance), do not implement immediately.
+- First ensure `task_plan.md` contains:
+  - clear acceptance criteria (what "done" means)
+  - an ordered checklist of steps with file paths
+  - verification steps per checklist item
+- If any of those are missing, ask focused questions and/or propose edits to `task_plan.md` before coding.
+
+## 2) One-step-at-a-time execution (anti-drift)
+- Execute exactly ONE checklist item at a time from `task_plan.md`.
+- Before starting a step: restate the step goal + file targets + verification in one short paragraph.
+- After finishing a step: confirm verification result and mark the step done in `task_plan.md` (or instruct the user to do so if you can't edit).
+
+## 3) TDD-first by default (Python)
+- For code changes that can be tested, follow RED → GREEN → REFACTOR:
+  1) Write/adjust a failing test (pytest preferred) or a minimal reproducible check.
+  2) Ensure it fails for the right reason.
+  3) Implement the minimal code to pass.
+  4) Refactor with tests staying green.
+- If TDD is impractical (e.g., pure refactor, glue code, or no test harness), explicitly say why and use a lightweight verification (type check, small script, or targeted manual test).
+
+## 4) Verification discipline (never "trust me")
+- Prefer these commands (choose what exists in repo; do NOT invent tools):
+  - `pytest -q` (or targeted `pytest path::test_name`)
+  - `python -m compileall .` for syntax sanity
+  - `ruff check .` / `ruff format .` if present
+  - `mypy .` if configured
+- If you cannot run commands, instruct the user to run the exact command and paste output.
+- Record failures/learned constraints in `progress.md` (brief, actionable).
+
+## 5) Safe edit policy (minimize blast radius)
+- Keep changes minimal and localized to the planned files.
+- No broad refactors unless the plan explicitly includes them.
+- Avoid changing public APIs unless the plan/acceptance requires it; if unavoidable, update callers + tests in the same step.
+
+## 6) Self-review before moving on (two quick checks)
+After each checklist item:
+- Spec check: Does the change satisfy the step + acceptance criteria (from `task_plan.md`)?
+- Quality check: Clear naming, small functions, error handling, no dead code, tests meaningful.
+
+## 7) When stuck (escalation instead of thrashing)
+- If a step fails twice, stop repeating the same attempt.
+- Write a short "blocker" note in `progress.md`:
+  - what you tried
+  - what failed (error message summary)
+  - 1–2 alternative approaches
+- Propose a plan update to unblock (add/modify checklist items).
+
+## 8) Defaults for Python projects
+- Testing: pytest
+- Style: prefer ruff if present; otherwise keep formatting consistent with existing code
+- Packaging: respect existing `pyproject.toml` / `requirements*.txt` conventions (do not introduce Poetry/Conda unless asked)
+
+## 9) Finish condition
+- Do not declare "done" until:
+  - all checklist items in `task_plan.md` are completed
+  - verification steps have been run (or user confirmed outputs)
+  - no known failing tests remain
