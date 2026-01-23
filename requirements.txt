@@ -1,0 +1,34 @@
+# Requirements for all skills in .skills directory
+# Generated from analysis of all skill scripts and existing requirements.txt files
+
+# Image processing (slack-gif-creator)
+pillow>=10.0.0
+imageio>=2.31.0
+imageio-ffmpeg>=0.4.9
+numpy>=1.24.0
+
+# MCP Builder
+anthropic>=0.39.0
+mcp>=1.1.0
+
+# Excel processing (xlsx)
+openpyxl>=3.0.0
+
+# Web testing (webapp-testing)
+playwright>=1.40.0
+
+# PowerPoint processing (pptx)
+python-pptx>=0.6.21
+six>=1.16.0
+
+# XML processing (pptx, docx)
+lxml>=4.9.0
+defusedxml>=0.7.1
+
+# PDF processing (pdf)
+pypdf>=3.0.0
+pdf2image>=1.16.0
+
+# YAML processing (skill-creator)
+pyyaml>=6.0
+
